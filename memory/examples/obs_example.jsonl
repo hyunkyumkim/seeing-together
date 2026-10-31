@@ -1,0 +1,9 @@
+{"v":1,"id":"m-000001","src":"mock","type":"robot_pose","t":1793434970.000,"frame":"map","pos":[0.00,0.00],"yaw":0.00}
+{"v":1,"id":"m-000002","src":"mock","type":"object","t":1793434971.500,"frame":"map","label":"mug","pos":[1.20,0.40],"conf":0.87}
+{"v":1,"id":"m-000003","src":"mock","type":"object","t":1793434972.100,"frame":"map","label":"backpack","pos":[-0.80,1.50],"conf":0.74}
+{"v":1,"id":"g-000412","src":"glasses","type":"tag","t":1793434978.123,"t_dev":128021.838,"frame":"image","tag_id":1,"center":[354,245],"corners":[[312,201],[398,204],[395,290],[309,286]],"img":[640,480],"frame_seq":412}
+{"v":1,"id":"g-000413","src":"glasses","type":"imu","t":1793434978.130,"t_dev":128021.845,"frame":"device","acc":[0.12,9.71,0.31],"gyr":[0.010,0.002,0.021]}
+{"v":1,"id":"m-000004","src":"mock","type":"person","t":1793434978.200,"frame":"map","pos":[1.85,0.30],"conf":0.60,"from":["g-000412"]}
+{"v":1,"id":"m-000005","src":"mock","type":"object","t":1793434985.400,"frame":"map","label":"mug","pos":[2.10,-0.30],"conf":0.81}
+{"v":1,"id":"m-000006","src":"mock","type":"robot_pose","t":1793434986.000,"frame":"map","pos":[0.90,0.20],"yaw":0.52}
+{"v":1,"id":"m-000007","src":"mock","type":"object","t":1793434980.000,"frame":"map","label":"mug","pos":[1.60,0.10],"conf":0.70}

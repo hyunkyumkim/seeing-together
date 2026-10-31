@@ -85,6 +85,10 @@ Optional: one run while walking (motion blur), and one with printed or on-screen
 
 - `<out>_frames.csv`: seq, capture timestamp, encode time, on-glasses capture->JPEG time, size, PC arrival time
 - `<out>_latency.csv`: one row per received frame that contained a clock tag
+- `--obs-out <path>` (optional): every real tag detection (IDs 0-99) as a schema-v1 `tag` observation,
+  one JSON object per line (see `memory/schema.md`); load it with `python ../memory/store.py <path>`.
+  Coordinates are pixels in the upright (rotated) view. The summary also lists, per tag ID, how many of
+  the checked frames it was seen in (only the newest frame is checked, so checked < received).
 - `<out>_summary.txt`: delivered fps, camera fps, frames not delivered (%), Mbit/s, arrival gaps,
   on-glasses capture->JPEG time, end-to-end latency (median / p95 / min / max)
 
@@ -115,3 +119,31 @@ Raw camera frames are not saved, so no images of the room end up in the reposito
 - An earlier build converted chroma pixel by pixel and delivered about 14 fps at 640x480; the numbers
   above are from the fixed build (row-wise copy).
 - `*_frames.csv` / `*_latency.csv` hold only timestamps and sizes, no images.
+
+## AprilTag detection on the stream
+
+Tags 0, 1 and 2 (tag36h11, black square about 15 cm, side by side on a monitor), glasses held by
+hand at the given distance and pointed at the tags, Wi-Fi, 30 s per run, `--no-clock`. Detection rate
+= checked frames in which the tag was found (only the newest frame is checked). Each run also wrote its
+detections as schema-v1 observations (`results/tag_*_obs.jsonl`), which load into `memory/store.py`.
+
+| Run | Distance | Size | Delivered fps | Tag 0 | Tag 1 | Tag 2 |
+|---|---|---|---|---|---|---|
+| tag_05m | 0.5 m | 640x480 | 30.0 | 100 % | 100 % | 100 % |
+| tag_1m | 1 m | 640x480 | 29.9 | 99.8 % | 100 % | 100 % |
+| tag_1m_b | 1 m | 640x480 | 30.0 | 99.8 % | 99.1 % | 100 % |
+| tag_2m | 2 m | 640x480 | 30.0 | 41.4 % | 40.5 % | 85.2 % |
+| tag_2m_b | 2 m | 640x480 | 29.9 | 21.8 % | 17.7 % | 58.1 % |
+| tag_2m_c | 2 m | 640x480 | 30.0 | 56.4 % | 64.1 % | 91.8 % |
+| tag_2m_720 | 2 m | 1280x720 | 26.8 | 62.6 % | 50.6 % | 83.0 % |
+| tag_2m_720_b | 2 m | 1280x720 | 27.1 | 86.7 % | 68.6 % | 93.3 % |
+
+- Up to 1 m, 640x480 finds all three tags in more than 99 % of frames (1 m repeated).
+- At 2 m detection is unreliable for a 15 cm tag: 18-92 % at 640x480 and 51-93 % at 1280x720. The spread
+  between runs at the same size (hand-held position, angle, head motion) is larger than the difference
+  between sizes, so these runs do not show whether 720p is better. A fixed mount and a larger tag are
+  needed for that.
+- Tag 2 (right) was found most often in every 2 m run; the cause (position in the image, monitor
+  glare) was not checked.
+- Distances by eye; tags on a monitor, not printed.
+

@@ -1,0 +1,19 @@
+connections: 1
+frames received (all connections): 901
+frames received (this connection): 901
+resolution: 640x480
+duration (PC clock): 30.0 s
+delivered fps: 30.0
+camera frames (seq range): 901  -> not delivered: 0 (0.0 %)
+camera fps (seq / sensor clock): 30.0
+JPEG size: mean 29.2 KB  -> 7.18 Mbit/s
+arrival gaps: median 33.9 ms, p95 45.1 ms, max 65.7 ms
+sensor time between delivered frames: median 33.3 ms
+on-glasses capture->JPEG: median 90.5 ms, p95 97.5 ms
+end-to-end latency: no clock tags seen in received frames
+real tag detections (IDs < 100): 1489
+frames checked for tags: 891 (only the newest frame is checked, so this can be below frames received)
+  tag 0: seen in 369 of 891 checked frames (41.4 %)
+  tag 1: seen in 361 of 891 checked frames (40.5 %)
+  tag 2: seen in 759 of 891 checked frames (85.2 %)
+tag observations written to tag_2m_b_obs.jsonl: 1489

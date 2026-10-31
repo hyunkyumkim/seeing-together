@@ -16,6 +16,7 @@ Outputs: <out>_frames.csv, <out>_latency.csv, <out>_summary.txt
 """
 import argparse
 import csv
+import json
 import socket
 import statistics
 import struct
@@ -46,7 +47,7 @@ class Receiver(threading.Thread):
         super().__init__(daemon=True)
         self.port = port
         self.frames = []          # (seq, capture_ts_ns, encoded_ns, device_pipe_us, w, h, nbytes, t_recv)
-        self.latest = None        # (seq, t_recv, jpeg)
+        self.latest = None        # (seq, t_recv, jpeg, capture_ts_ns)
         self.lock = threading.Lock()
         self.connections = 0
         self.first_recv = None
@@ -78,7 +79,7 @@ class Receiver(threading.Thread):
                         if self.first_recv is None:
                             self.first_recv = t
                         self.frames.append((seq, cap, enc, pipe, w, h, n, t))
-                        self.latest = (seq, t, jpeg)
+                        self.latest = (seq, t, jpeg, cap)
             except (ConnectionError, OSError, ValueError) as e:
                 print(f"Connection ended: {e}")
             finally:
@@ -109,6 +110,11 @@ def main():
     ap.add_argument("--step-ms", type=int, default=50, help="tag clock step")
     ap.add_argument("--clock-px", type=int, default=480, help="tag clock size in pixels")
     ap.add_argument("--headless", action="store_true")
+    ap.add_argument("--no-clock", action="store_true",
+                    help="do not show the tag clock window (use when pointing the glasses at real tags)")
+    ap.add_argument("--obs-out", metavar="PATH",
+                    help="write each real tag detection (IDs < 100) as a schema-v1 'tag' observation "
+                         "(JSONL, see memory/schema.md)")
     args = ap.parse_args()
 
     rx = Receiver(args.port)
@@ -119,6 +125,10 @@ def main():
     shown = {}            # clock tag id -> perf_counter time it was first drawn
     latency_rows = []     # (seq, t_recv, tag_id, latency_ms)
     real_tags = 0
+    checked = 0           # frames that were decoded and searched for tags
+    tag_frames = {}       # real tag id -> number of checked frames it was seen in
+    obs_f = open(args.obs_out, "w", encoding="utf-8") if args.obs_out else None
+    unix_off = time.time() - time.perf_counter()  # perf_counter -> laptop Unix time
     ghost_since, ghost_last = {}, {}   # static clock-tag IDs (e.g. a stale window) are ignored
     last_k, last_seq_shown = None, None
     t0 = time.perf_counter()
@@ -134,7 +144,7 @@ def main():
 
             # tag clock
             k = int((now - t0) * 1000 // args.step_ms)
-            if k != last_k:
+            if k != last_k and not args.no_clock:
                 tid = CLOCK_BASE + k % CLOCK_COUNT
                 img = cv2.cvtColor(tag_image(dictionary, tid, args.clock_px), cv2.COLOR_GRAY2BGR)
                 cv2.putText(img, f"{(now - t0) * 1000:10.0f} ms", (10, 30),
@@ -149,7 +159,7 @@ def main():
             with rx.lock:
                 latest = rx.latest
             if latest and latest[0] != last_seq_shown:
-                seq, t_recv, jpeg = latest
+                seq, t_recv, jpeg, cap_ns = latest
                 last_seq_shown = seq
                 frame = cv2.imdecode(np.frombuffer(jpeg, np.uint8), cv2.IMREAD_COLOR)
                 if frame is not None:
@@ -157,9 +167,10 @@ def main():
                            "180": cv2.ROTATE_180}.get(args.rotate)
                     if rot is not None:
                         frame = cv2.rotate(frame, rot)
-                    _, ids, _ = detector.detectMarkers(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY))
+                    corners, ids, _ = detector.detectMarkers(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY))
+                    checked += 1
                     if ids is not None:
-                        for i in ids.flatten().tolist():
+                        for k, i in enumerate(ids.flatten().tolist()):
                             if i >= CLOCK_BASE:
                                 # a live clock tag changes every step; one that stays in view
                                 # for > 0.5 s is a static ghost (stale window / reflection)
@@ -172,6 +183,16 @@ def main():
                                 latency_rows.append((seq, t_recv, i, (t_recv - shown[i]) * 1000))
                             elif i < CLOCK_BASE:
                                 real_tags += 1
+                                tag_frames[i] = tag_frames.get(i, 0) + 1
+                                if obs_f:
+                                    c = corners[k].reshape(4, 2)
+                                    obs_f.write(json.dumps({
+                                        "v": 1, "id": f"g-{seq:06d}-{i}", "src": "glasses", "type": "tag",
+                                        "t": round(unix_off + t_recv, 3), "t_dev": cap_ns / 1e9, "frame": "image",
+                                        "tag_id": i,
+                                        "center": [round(float(c[:, 0].mean()), 1), round(float(c[:, 1].mean()), 1)],
+                                        "corners": [[round(float(x), 1), round(float(y), 1)] for x, y in c],
+                                        "img": [frame.shape[1], frame.shape[0]], "frame_seq": seq}) + "\n")
                     lat = [r[3] for r in latency_rows[-30:]]
                     n = len(rx.frames)
                     el = (t_recv - rx.first_recv) if rx.first_recv else 0
@@ -197,10 +218,12 @@ def main():
 
     with rx.lock:
         frames = list(rx.frames)
-    write_outputs(args, frames, latency_rows, real_tags, rx.connections)
+    if obs_f:
+        obs_f.close()
+    write_outputs(args, frames, latency_rows, real_tags, rx.connections, checked, tag_frames)
 
 
-def write_outputs(args, frames, latency_rows, real_tags, connections):
+def write_outputs(args, frames, latency_rows, real_tags, connections, checked=0, tag_frames=None):
     with open(f"{args.out}_frames.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["seq", "capture_ts_ns", "encoded_ns", "device_pipe_us", "width", "height", "jpeg_bytes", "pc_recv_s"])
@@ -255,6 +278,13 @@ def write_outputs(args, frames, latency_rows, real_tags, connections):
     else:
         lines.append("end-to-end latency: no clock tags seen in received frames")
     lines.append(f"real tag detections (IDs < {CLOCK_BASE}): {real_tags}")
+    lines.append(f"frames checked for tags: {checked} (only the newest frame is checked, so this can be "
+                 f"below frames received)")
+    for i in sorted(tag_frames or {}):
+        lines.append(f"  tag {i}: seen in {tag_frames[i]} of {checked} checked frames "
+                     f"({100 * tag_frames[i] / checked:.1f} %)")
+    if args.obs_out:
+        lines.append(f"tag observations written to {args.obs_out}: {real_tags}")
     text = "\n".join(lines)
     print("\n" + text)
     with open(f"{args.out}_summary.txt", "w") as f:
