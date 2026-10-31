@@ -110,6 +110,8 @@ def main():
     ap.add_argument("--step-ms", type=int, default=50, help="tag clock step")
     ap.add_argument("--clock-px", type=int, default=480, help="tag clock size in pixels")
     ap.add_argument("--headless", action="store_true")
+    ap.add_argument("--obs-interval", type=float, default=0.0, metavar="SEC",
+                    help="write at most one observation per tag every SEC seconds (0 = every frame)")
     ap.add_argument("--no-clock", action="store_true",
                     help="do not show the tag clock window (use when pointing the glasses at real tags)")
     ap.add_argument("--obs-out", metavar="PATH",
@@ -128,6 +130,8 @@ def main():
     checked = 0           # frames that were decoded and searched for tags
     tag_frames = {}       # real tag id -> number of checked frames it was seen in
     obs_f = open(args.obs_out, "w", encoding="utf-8") if args.obs_out else None
+    last_written = {}     # real tag id -> t_recv of the last observation written
+    obs_written = 0
     unix_off = time.time() - time.perf_counter()  # perf_counter -> laptop Unix time
     ghost_since, ghost_last = {}, {}   # static clock-tag IDs (e.g. a stale window) are ignored
     last_k, last_seq_shown = None, None
@@ -184,7 +188,9 @@ def main():
                             elif i < CLOCK_BASE:
                                 real_tags += 1
                                 tag_frames[i] = tag_frames.get(i, 0) + 1
-                                if obs_f:
+                                if obs_f and t_recv - last_written.get(i, -1e9) >= args.obs_interval:
+                                    last_written[i] = t_recv
+                                    obs_written += 1
                                     c = corners[k].reshape(4, 2)
                                     obs_f.write(json.dumps({
                                         "v": 1, "id": f"g-{seq:06d}-{i}", "src": "glasses", "type": "tag",
@@ -220,10 +226,11 @@ def main():
         frames = list(rx.frames)
     if obs_f:
         obs_f.close()
-    write_outputs(args, frames, latency_rows, real_tags, rx.connections, checked, tag_frames)
+    write_outputs(args, frames, latency_rows, real_tags, rx.connections, checked, tag_frames, obs_written)
 
 
-def write_outputs(args, frames, latency_rows, real_tags, connections, checked=0, tag_frames=None):
+def write_outputs(args, frames, latency_rows, real_tags, connections, checked=0, tag_frames=None,
+                  obs_written=0):
     with open(f"{args.out}_frames.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["seq", "capture_ts_ns", "encoded_ns", "device_pipe_us", "width", "height", "jpeg_bytes", "pc_recv_s"])
@@ -284,7 +291,8 @@ def write_outputs(args, frames, latency_rows, real_tags, connections, checked=0,
         lines.append(f"  tag {i}: seen in {tag_frames[i]} of {checked} checked frames "
                      f"({100 * tag_frames[i] / checked:.1f} %)")
     if args.obs_out:
-        lines.append(f"tag observations written to {args.obs_out}: {real_tags}")
+        every = f"at most 1 per tag every {args.obs_interval:g} s" if args.obs_interval > 0 else "every detection"
+        lines.append(f"tag observations written to {args.obs_out}: {obs_written} ({every})")
     text = "\n".join(lines)
     print("\n" + text)
     with open(f"{args.out}_summary.txt", "w") as f:
