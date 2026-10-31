@@ -36,6 +36,11 @@
         <activity
             android:name=".CameraTestActivity"
             android:exported="true" />
+
+        <!-- stream-test/FrameStreamActivity.kt -->
+        <activity
+            android:name=".FrameStreamActivity"
+            android:exported="true" />
     </application>
 
 </manifest>

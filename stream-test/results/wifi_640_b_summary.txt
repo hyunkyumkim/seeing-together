@@ -1,0 +1,14 @@
+connections: 1
+frames received (all connections): 1194
+frames received (this connection): 1194
+resolution: 640x480
+duration (PC clock): 40.0 s
+delivered fps: 29.8
+camera frames (seq range): 1202  -> not delivered: 8 (0.7 %)
+camera fps (seq / sensor clock): 30.0
+JPEG size: mean 28.8 KB  -> 7.05 Mbit/s
+arrival gaps: median 33.3 ms, p95 51.4 ms, max 109.4 ms
+sensor time between delivered frames: median 33.3 ms
+on-glasses capture->JPEG: median 95.4 ms, p95 107.2 ms
+end-to-end latency (tag clock, step 50 ms): n=563, median 100 ms, p95 122 ms, min 62 ms, max 164 ms
+real tag detections (IDs < 100): 0
