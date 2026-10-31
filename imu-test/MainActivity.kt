@@ -31,6 +31,7 @@ class MainActivity : Activity(), SensorEventListener {
     private var seqG = 0L
     private var count = 0L
     private var queueFull = 0L
+    @Volatile private var sendErrors = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +52,11 @@ class MainActivity : Activity(), SensorEventListener {
                 batch.clear(); batch.add(first)
                 queue.drainTo(batch, 7)
                 val bytes = batch.joinToString("\n").toByteArray()
-                socket.send(DatagramPacket(bytes, bytes.size, addr, port))
+                try {
+                    socket.send(DatagramPacket(bytes, bytes.size, addr, port))
+                } catch (e: java.io.IOException) {
+                    sendErrors++
+                }
             }
             socket.close()
         }
@@ -72,7 +77,7 @@ class MainActivity : Activity(), SensorEventListener {
         }
         if (!queue.offer(line)) queueFull++
         if (++count % 200 == 0L) {
-            tv.text = "events=$count  accSeq=$seqA  gyrSeq=$seqG  queueFull=$queueFull"
+            tv.text = "events=$count  accSeq=$seqA  gyrSeq=$seqG  queueFull=$queueFull  sendErr=$sendErrors"
         }
     }
 
