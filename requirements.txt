@@ -1,0 +1,3 @@
+# Laptop-side Python packages (Python 3.10+). imu_receiver.py needs only the standard library.
+opencv-contrib-python>=4.7   # AprilTag (aruco) detector; tests were run with 5.0.0
+numpy

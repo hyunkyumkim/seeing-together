@@ -75,6 +75,11 @@ def main():
         print(f"  generated rate   : {rate_dev:.1f} Hz (from seq / device clock)")
         print(f"  delivered rate   : {rate_pc:.1f} Hz (received / PC clock)")
         print(f"  dt device ts     : mean {statistics.mean(dts):.2f} ms, p95 {p95:.2f} ms, max {max(dts):.2f} ms")
+        arr = sorted({x[3] for x in r})  # one instant per UDP packet
+        gaps = [(b - a_) * 1000 for a_, b in zip(arr, arr[1:])]
+        if gaps:
+            gp95 = sorted(gaps)[int(0.95 * (len(gaps) - 1))]
+            print(f"  PC arrival gaps  : mean {statistics.mean(gaps):.1f} ms, p95 {gp95:.1f} ms, max {max(gaps):.1f} ms ({len(arr)} packet arrivals)")
 
 
 if __name__ == "__main__":

@@ -1,2 +1,14 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# camera-test: raw photos (they show the tester's screen) and generated tag images
 camera-test/tagphotos/
-camera-test/.venv/
+camera-test/tag_*.png
