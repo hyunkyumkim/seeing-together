@@ -1,0 +1,6 @@
+# torch/torchvision are installed first by setup_env.sh from the cu126 index
+transformers>=4.57
+accelerate>=1.0
+qwen-vl-utils>=0.0.11
+huggingface_hub>=0.30
+pillow>=10
