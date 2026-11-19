@@ -35,3 +35,9 @@ distance / angle / position error for one tag and two tags, mean and SD).
 
 Note: with nearly head-on views at 2-3 m, a flat target can give two similar poses (tilted up or down), so
 the position error can be much larger than the distance error. Report both.
+
+## Data in this folder
+- `calib/`: the 22 checkerboard frames used for `camera.json` (640x480, rotated upright).
+- `poses/d<cm>_a<deg>_r<k>/`: 20 frames per placement; 9 positions x 3 placements (Nov 18, home test room).
+  200/60, 300/30 and 300/60 were not measured (not enough floor space).
+- `pose_frames.csv`, `pose_summary.csv`: output of `tag_pose.py --tag-mm 150 --spacing-cm 20`.
