@@ -1,0 +1,602 @@
+{
+ "v": 1,
+ "frame_id": "map",
+ "maps": {
+  "frame_id": "map",
+  "grid_npz": "/Users/khang/Documents/ucla/F26/m202a/seeing-together/robot_stack/go2_maps/lab.grid.npz",
+  "occupancy_pgm": "/Users/khang/Documents/ucla/F26/m202a/seeing-together/robot_stack/go2_maps/lab.pgm",
+  "occupancy_yaml": "/Users/khang/Documents/ucla/F26/m202a/seeing-together/robot_stack/go2_maps/lab.yaml",
+  "places_json": "/Users/khang/Documents/ucla/F26/m202a/seeing-together/robot_stack/go2_maps/lab.places.json",
+  "origin_m": [
+   -25.0,
+   -25.0
+  ],
+  "resolution_m": 0.05
+ },
+ "places": {
+  "desk_khang": {
+   "place_id": "desk_khang",
+   "name": "Khang's desk",
+   "pose": {
+    "x": 4.559,
+    "y": 0.205,
+    "yaw_deg": -18.0
+   },
+   "navigation_goal": {
+    "x": 3.716,
+    "y": 0.625,
+    "yaw_deg": -18.0
+   },
+   "region": [
+    [
+     4.159,
+     -0.19500000000000003
+    ],
+    [
+     4.9590000000000005,
+     -0.19500000000000003
+    ],
+    [
+     4.9590000000000005,
+     0.605
+    ],
+    [
+     4.159,
+     0.605
+    ]
+   ],
+   "object_ids": [
+    "object_01",
+    "object_02",
+    "object_03"
+   ]
+  },
+  "desk_oliver": {
+   "place_id": "desk_oliver",
+   "name": "Oliver's desk",
+   "pose": {
+    "x": 0.536,
+    "y": -1.594,
+    "yaw_deg": -82.1
+   },
+   "navigation_goal": {
+    "x": 0.386,
+    "y": -0.711,
+    "yaw_deg": -82.1
+   },
+   "region": [
+    [
+     0.136,
+     -1.9940000000000002
+    ],
+    [
+     0.936,
+     -1.9940000000000002
+    ],
+    [
+     0.936,
+     -1.194
+    ],
+    [
+     0.136,
+     -1.194
+    ]
+   ],
+   "object_ids": [
+    "object_04",
+    "object_05",
+    "object_06"
+   ]
+  },
+  "desk_kang": {
+   "place_id": "desk_kang",
+   "name": "Kang's desk",
+   "pose": {
+    "x": 4.632,
+    "y": 2.047,
+    "yaw_deg": 90.5
+   },
+   "navigation_goal": {
+    "x": 4.504,
+    "y": 1.92,
+    "yaw_deg": 90.5
+   },
+   "region": [
+    [
+     4.231999999999999,
+     1.6470000000000002
+    ],
+    [
+     5.032,
+     1.6470000000000002
+    ],
+    [
+     5.032,
+     2.447
+    ],
+    [
+     4.231999999999999,
+     2.447
+    ]
+   ],
+   "object_ids": [
+    "object_07",
+    "object_08",
+    "object_09"
+   ]
+  },
+  "desk_joseph": {
+   "place_id": "desk_joseph",
+   "name": "Joseph's desk",
+   "pose": {
+    "x": 1.826,
+    "y": 2.382,
+    "yaw_deg": -79.3
+   },
+   "navigation_goal": {
+    "x": 1.54,
+    "y": 3.172,
+    "yaw_deg": -79.3
+   },
+   "region": [
+    [
+     1.4260000000000002,
+     1.9820000000000002
+    ],
+    [
+     2.226,
+     1.9820000000000002
+    ],
+    [
+     2.226,
+     2.782
+    ],
+    [
+     1.4260000000000002,
+     2.782
+    ]
+   ],
+   "object_ids": [
+    "object_10",
+    "object_11",
+    "object_12"
+   ]
+  }
+ },
+ "objects": {
+  "object_01": {
+   "object_id": "object_01",
+   "category": "cup",
+   "name": "cup on Khang's desk",
+   "pose_3d": {
+    "x": 4.479,
+    "y": 0.044,
+    "z": 0.75,
+    "yaw_deg": -18.0
+   },
+   "place_id": "desk_khang",
+   "last_seen": 1792428562.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_01"
+   ]
+  },
+  "object_02": {
+   "object_id": "object_02",
+   "category": "bottle",
+   "name": "bottle on Khang's desk",
+   "pose_3d": {
+    "x": 4.559,
+    "y": 0.205,
+    "z": 0.75,
+    "yaw_deg": -18.0
+   },
+   "place_id": "desk_khang",
+   "last_seen": 1792428562.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_02"
+   ]
+  },
+  "object_03": {
+   "object_id": "object_03",
+   "category": "book",
+   "name": "book on Khang's desk",
+   "pose_3d": {
+    "x": 4.639,
+    "y": 0.366,
+    "z": 0.75,
+    "yaw_deg": -18.0
+   },
+   "place_id": "desk_khang",
+   "last_seen": 1792428562.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_03"
+   ]
+  },
+  "object_04": {
+   "object_id": "object_04",
+   "category": "cup",
+   "name": "cup on Oliver's desk",
+   "pose_3d": {
+    "x": 0.359,
+    "y": -1.624,
+    "z": 0.75,
+    "yaw_deg": -82.1
+   },
+   "place_id": "desk_oliver",
+   "last_seen": 1792428727.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_04"
+   ]
+  },
+  "object_05": {
+   "object_id": "object_05",
+   "category": "bottle",
+   "name": "bottle on Oliver's desk",
+   "pose_3d": {
+    "x": 0.536,
+    "y": -1.594,
+    "z": 0.75,
+    "yaw_deg": -82.1
+   },
+   "place_id": "desk_oliver",
+   "last_seen": 1792428727.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_05"
+   ]
+  },
+  "object_06": {
+   "object_id": "object_06",
+   "category": "book",
+   "name": "book on Oliver's desk",
+   "pose_3d": {
+    "x": 0.713,
+    "y": -1.564,
+    "z": 0.75,
+    "yaw_deg": -82.1
+   },
+   "place_id": "desk_oliver",
+   "last_seen": 1792428727.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_06"
+   ]
+  },
+  "object_07": {
+   "object_id": "object_07",
+   "category": "cup",
+   "name": "cup on Kang's desk",
+   "pose_3d": {
+    "x": 4.759,
+    "y": 1.919,
+    "z": 0.75,
+    "yaw_deg": 90.5
+   },
+   "place_id": "desk_kang",
+   "last_seen": 1792428497.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_07"
+   ]
+  },
+  "object_08": {
+   "object_id": "object_08",
+   "category": "bottle",
+   "name": "bottle on Kang's desk",
+   "pose_3d": {
+    "x": 4.632,
+    "y": 2.047,
+    "z": 0.75,
+    "yaw_deg": 90.5
+   },
+   "place_id": "desk_kang",
+   "last_seen": 1792428497.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_08"
+   ]
+  },
+  "object_09": {
+   "object_id": "object_09",
+   "category": "book",
+   "name": "book on Kang's desk",
+   "pose_3d": {
+    "x": 4.505,
+    "y": 2.175,
+    "z": 0.75,
+    "yaw_deg": 90.5
+   },
+   "place_id": "desk_kang",
+   "last_seen": 1792428497.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_09"
+   ]
+  },
+  "object_10": {
+   "object_id": "object_10",
+   "category": "cup",
+   "name": "cup on Joseph's desk",
+   "pose_3d": {
+    "x": 1.657,
+    "y": 2.321,
+    "z": 0.75,
+    "yaw_deg": -79.3
+   },
+   "place_id": "desk_joseph",
+   "last_seen": 1792428416.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_10"
+   ]
+  },
+  "object_11": {
+   "object_id": "object_11",
+   "category": "bottle",
+   "name": "bottle on Joseph's desk",
+   "pose_3d": {
+    "x": 1.826,
+    "y": 2.382,
+    "z": 0.75,
+    "yaw_deg": -79.3
+   },
+   "place_id": "desk_joseph",
+   "last_seen": 1792428416.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_11"
+   ]
+  },
+  "object_12": {
+   "object_id": "object_12",
+   "category": "book",
+   "name": "book on Joseph's desk",
+   "pose_3d": {
+    "x": 1.995,
+    "y": 2.443,
+    "z": 0.75,
+    "yaw_deg": -79.3
+   },
+   "place_id": "desk_joseph",
+   "last_seen": 1792428416.0,
+   "status": "observed",
+   "observation_ids": [
+    "obs_object_12"
+   ]
+  }
+ },
+ "observations": {
+  "obs_object_01": {
+   "observation_id": "obs_object_01",
+   "object_id": "object_01",
+   "timestamp": 1792428562.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 3.716,
+    "y": 0.625,
+    "yaw_deg": -18.0
+   },
+   "observed_pose": {
+    "x": 4.479,
+    "y": 0.044,
+    "z": 0.75,
+    "yaw_deg": -18.0
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_02": {
+   "observation_id": "obs_object_02",
+   "object_id": "object_02",
+   "timestamp": 1792428562.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 3.716,
+    "y": 0.625,
+    "yaw_deg": -18.0
+   },
+   "observed_pose": {
+    "x": 4.559,
+    "y": 0.205,
+    "z": 0.75,
+    "yaw_deg": -18.0
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_03": {
+   "observation_id": "obs_object_03",
+   "object_id": "object_03",
+   "timestamp": 1792428562.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 3.716,
+    "y": 0.625,
+    "yaw_deg": -18.0
+   },
+   "observed_pose": {
+    "x": 4.639,
+    "y": 0.366,
+    "z": 0.75,
+    "yaw_deg": -18.0
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_04": {
+   "observation_id": "obs_object_04",
+   "object_id": "object_04",
+   "timestamp": 1792428727.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 0.386,
+    "y": -0.711,
+    "yaw_deg": -82.1
+   },
+   "observed_pose": {
+    "x": 0.359,
+    "y": -1.624,
+    "z": 0.75,
+    "yaw_deg": -82.1
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_05": {
+   "observation_id": "obs_object_05",
+   "object_id": "object_05",
+   "timestamp": 1792428727.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 0.386,
+    "y": -0.711,
+    "yaw_deg": -82.1
+   },
+   "observed_pose": {
+    "x": 0.536,
+    "y": -1.594,
+    "z": 0.75,
+    "yaw_deg": -82.1
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_06": {
+   "observation_id": "obs_object_06",
+   "object_id": "object_06",
+   "timestamp": 1792428727.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 0.386,
+    "y": -0.711,
+    "yaw_deg": -82.1
+   },
+   "observed_pose": {
+    "x": 0.713,
+    "y": -1.564,
+    "z": 0.75,
+    "yaw_deg": -82.1
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_07": {
+   "observation_id": "obs_object_07",
+   "object_id": "object_07",
+   "timestamp": 1792428497.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 4.504,
+    "y": 1.92,
+    "yaw_deg": 90.5
+   },
+   "observed_pose": {
+    "x": 4.759,
+    "y": 1.919,
+    "z": 0.75,
+    "yaw_deg": 90.5
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_08": {
+   "observation_id": "obs_object_08",
+   "object_id": "object_08",
+   "timestamp": 1792428497.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 4.504,
+    "y": 1.92,
+    "yaw_deg": 90.5
+   },
+   "observed_pose": {
+    "x": 4.632,
+    "y": 2.047,
+    "z": 0.75,
+    "yaw_deg": 90.5
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_09": {
+   "observation_id": "obs_object_09",
+   "object_id": "object_09",
+   "timestamp": 1792428497.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 4.504,
+    "y": 1.92,
+    "yaw_deg": 90.5
+   },
+   "observed_pose": {
+    "x": 4.505,
+    "y": 2.175,
+    "z": 0.75,
+    "yaw_deg": 90.5
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_10": {
+   "observation_id": "obs_object_10",
+   "object_id": "object_10",
+   "timestamp": 1792428416.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 1.54,
+    "y": 3.172,
+    "yaw_deg": -79.3
+   },
+   "observed_pose": {
+    "x": 1.657,
+    "y": 2.321,
+    "z": 0.75,
+    "yaw_deg": -79.3
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_11": {
+   "observation_id": "obs_object_11",
+   "object_id": "object_11",
+   "timestamp": 1792428416.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 1.54,
+    "y": 3.172,
+    "yaw_deg": -79.3
+   },
+   "observed_pose": {
+    "x": 1.826,
+    "y": 2.382,
+    "z": 0.75,
+    "yaw_deg": -79.3
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  },
+  "obs_object_12": {
+   "observation_id": "obs_object_12",
+   "object_id": "object_12",
+   "timestamp": 1792428416.0,
+   "observer_id": "go2",
+   "observer_pose": {
+    "x": 1.54,
+    "y": 3.172,
+    "yaw_deg": -79.3
+   },
+   "observed_pose": {
+    "x": 1.995,
+    "y": 2.443,
+    "z": 0.75,
+    "yaw_deg": -79.3
+   },
+   "frame_id": "map",
+   "source": "synthetic"
+  }
+ }
+}
