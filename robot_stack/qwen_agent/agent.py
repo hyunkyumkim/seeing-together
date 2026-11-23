@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""A local Qwen3-VL agent that drives the Go2 through the console's tools.
+"""Navigation agent for the Go2. It drives the dog through the console's tools.
 
-Loop: the model reads the task and what it has seen so far, writes a sentence of reasoning and one
-tool call; the tool runs on the dog; its result (text and photos) goes back to the model; repeat until
-the model calls finish or the step limit is reached. Tool calls use Qwen's native format:
-<tool_call>{"name": ..., "arguments": {...}}</tool_call>.
+Two entry points set the model: ask_qwen.sh loads Qwen on this GPU, ask_gpt.sh calls OpenAI.
+GPT uses native function calls. Qwen writes <tool_call>{"name": ..., "arguments": {...}}</tool_call>.
+Each turn runs one tool; the text and photos come back until the model calls finish.
 
   ./run.sh "find the red cup"          one task, then exit
   ./run.sh                             interactive: type tasks, /reset clears memory, /quit exits
@@ -41,10 +40,18 @@ For each function call, return a json object with function name and arguments wi
 Write one or two short sentences first (what you see, why this tool), then exactly one <tool_call>."""
 
 
-def system_prompt():
+def openai_tools():
+    """Chat Completions tool list. The console tools are the functions the model may call."""
+    return [{"type": "function", "function": {k: t[k] for k in ("name", "description", "parameters")}}
+            for t in tools.TOOLS]
+
+
+def system_prompt(native_tools=False):
     with open(os.path.join(HERE, "prompt.md")) as f:
         base = f.read().strip()
-    specs = "\n".join(json.dumps({"type": "function", "function": t}) for t in tools.TOOLS)
+    if native_tools:
+        return base + "\n\nThe tools are available as functions. Call exactly one each turn."
+    specs = "\n".join(json.dumps(t) for t in openai_tools())
     return base + TOOLS_BLOCK.format(specs=specs)
 
 
@@ -113,9 +120,10 @@ def prune_images(messages, keep):
 
 
 class Session:
-    def __init__(self, vlm, max_steps, keep_images, run_dir):
+    def __init__(self, vlm, max_steps, keep_images, run_dir, native_tools=False):
         self.vlm, self.max_steps, self.keep_images, self.run_dir = vlm, max_steps, keep_images, run_dir
-        self.system = system_prompt()
+        self.native_tools = native_tools
+        self.system = system_prompt(native_tools)
         self.reset()
         os.makedirs(run_dir, exist_ok=True)
         self.log = open(os.path.join(run_dir, "transcript.jsonl"), "a")
@@ -144,13 +152,17 @@ class Session:
         for step in range(1, self.max_steps + 1):
             t0 = time.time()
             reply = self.vlm.chat(prune_images(self.messages, self.keep_images))
-            self.messages.append({"role": "assistant", "content": reply})
-            thought, name, args = parse_reply(reply)
+            if reply.message is not None and (self.native_tools or reply.name):
+                self.messages.append(reply.message)
+                thought, name, args = reply.text.strip(), reply.name, reply.args
+            else:
+                self.messages.append({"role": "assistant", "content": reply.text})
+                thought, name, args = parse_reply(reply.text)
             if thought:
                 print(thought, flush=True)
             if name is None:
                 print(f"[no tool call, stopping after {step} steps]", flush=True)
-                self.record(event="final", text=reply)
+                self.record(event="final", text=reply.text)
                 tools.release_control()
                 return
             print(f"  → {name} {json.dumps(args)}   ({time.time() - t0:.1f} s thinking)", flush=True)
@@ -161,6 +173,17 @@ class Session:
             if name == "finish":
                 print(f"[done in {step} steps]", flush=True)
                 return
+            calls = (reply.message or {}).get("tool_calls") if reply.message else None
+            if calls:
+                # The tool message answers the function call. Photos follow as a user turn:
+                # a tool message itself cannot carry the images.
+                self.messages.append({"role": "tool", "tool_call_id": calls[0]["id"], "name": name, "content": text})
+                if imgs:
+                    content = [{"type": "text", "text": "Photos from this tool:"}]
+                    for cap, img in imgs:
+                        content += [{"type": "text", "text": cap}, {"type": "image", "image": img}]
+                    self.messages.append({"role": "user", "content": content})
+                continue
             content = [{"type": "text", "text": f"[result of {name}]\n{text}"}]
             for cap, img in imgs:
                 content += [{"type": "text", "text": cap}, {"type": "image", "image": img}]
@@ -172,11 +195,14 @@ class Session:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Local Qwen3-VL agent for the Go2")
+    backend = os.environ.get("QWEN_BACKEND", "local")
+    model = os.environ.get("QWEN_MODEL") or ("gpt-4o" if backend == "openai" else "Qwen/Qwen3-VL-8B-Instruct")
+    url = os.environ.get("QWEN_URL") or ("https://api.openai.com/v1" if backend == "openai" else None)
+    ap = argparse.ArgumentParser(description="Go2 navigation agent (ask_qwen.sh or ask_gpt.sh)")
     ap.add_argument("task", nargs="*", help="what to do; empty = interactive")
-    ap.add_argument("--backend", choices=("local", "openai"), default=os.environ.get("QWEN_BACKEND", "local"))
-    ap.add_argument("--model", default=os.environ.get("QWEN_MODEL", "Qwen/Qwen3-VL-8B-Instruct"))
-    ap.add_argument("--url", default=os.environ.get("QWEN_URL"), help="OpenAI-compatible server (backend=openai)")
+    ap.add_argument("--backend", choices=("local", "openai"), default=backend)
+    ap.add_argument("--model", default=model)
+    ap.add_argument("--url", default=url, help="OpenAI-compatible server (backend=openai)")
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--max-steps", type=int, default=30)
     ap.add_argument("--keep-images", type=int, default=6, help="most recent photos kept in the model's context")
@@ -185,11 +211,13 @@ def main():
     a = ap.parse_args()
 
     if not tools.console_up():
-        sys.exit(f"The console isn't running at {tools.CONSOLE}: start it with run_go2_keys.sh")
+        sys.exit(f"The console isn't running at {tools.CONSOLE}: start it with ./start_console.sh")
+    if a.backend == "openai" and "api.openai.com" in (a.url or "") and not os.environ.get("GO2_AGENT_NAME"):
+        tools.CLIENT = "gpt-agent"
     from vlm import make_backend
-    vlm = make_backend(a.backend, a.model, a.url, a.device, a.max_new_tokens)
+    vlm = make_backend(a.backend, a.model, a.url, a.device, a.max_new_tokens, tools=openai_tools())
     run_dir = os.path.join(a.runs, time.strftime("%Y%m%d_%H%M%S"))
-    s = Session(vlm, a.max_steps, a.keep_images, run_dir)
+    s = Session(vlm, a.max_steps, a.keep_images, run_dir, native_tools=getattr(vlm, "native_tools", False))
     print(f"[log] {run_dir}", flush=True)
     try:
         if a.task:
