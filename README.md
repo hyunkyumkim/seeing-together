@@ -4,6 +4,8 @@ Khang Nguyen and Hyun Kyum Kim
 
 UCLA ECE M202A, Fall 2026 (Project 1). Shared, time-stamped object memory for human-robot object search with RayNeo X3 Pro smart glasses and a Unitree Go2.
 
+**Project page:** [hyunkyumkim.github.io/seeing-together](https://hyunkyumkim.github.io/seeing-together/) (`index.html` in this repo)
+
 **Checkpoint slides:** [P01_Checkpoint.pdf](P01_Checkpoint.pdf) (November 10, 2026)
 
 ## Overview

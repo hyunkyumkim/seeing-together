@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Seeing Together</title>
+<meta name="description" content="Shared, time-stamped object memory for a person in RayNeo X3 Pro glasses and a Unitree Go2. UCLA ECE M202A, Fall 2026.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/site.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Seeing Together">
+  <a class="nav-title" href="#top">Seeing Together</a>
+  <div class="explore">
+    <button class="pill" id="exploreBtn" type="button" aria-expanded="false" aria-controls="exploreMenu">Explore</button>
+    <div class="explore-menu" id="exploreMenu" hidden>
+      <a href="#question">Question</a>
+      <a href="#scope">Scope</a>
+      <a href="#loop">How it works</a>
+      <a href="#map">Lab map</a>
+      <a href="#pose">Tag pose</a>
+      <a href="#places">Saved places</a>
+      <a href="#eval">Evaluation</a>
+      <a href="#plan">Plan</a>
+      <a href="#risks">Risks</a>
+      <a href="#cite">Citation</a>
+      <a href="P01_Checkpoint.pdf">Checkpoint slides (Nov 10)</a>
+      <a href="https://github.com/hyunkyumkim/seeing-together">Code</a>
+    </div>
+  </div>
+  <a class="pill out hide-sm" href="P01_Checkpoint.pdf">Checkpoint slides</a>
+  <a class="pill solid" href="https://github.com/hyunkyumkim/seeing-together">Code</a>
+</nav>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="wrap">
+    <p class="eyebrow">Seeing Together</p>
+    <h1 class="hx">The glasses saw it. The robot should still know where.</h1>
+    <p class="hero-sub">Shared, time-stamped object memory for a person in RayNeo X3 Pro glasses and a Unitree Go2.</p>
+    <p class="copy">Khang Nguyen and Hyun Kyum Kim · UCLA ECE M202A, Fall 2026</p>
+  </div>
+  <div class="wrap stage" style="margin-top:32px">
+    <img src="map_vis/mapping_teaser.gif" width="560" height="350" alt="The Go2 lidar map of the lab filling in as the robot walks. A red trail follows the path and a green dot marks the robot.">
+  </div>
+  <div class="wrap buy">
+    <p>17 named places on one lidar map.<span>Checkpoint slides: P01_Checkpoint.pdf (November 10, 2026)</span></p>
+    <a class="cta" href="P01_Checkpoint.pdf">Checkpoint slides</a>
+  </div>
+</section>
+
+<section class="sec" id="question">
+  <div class="wrap-copy">
+    <p class="eyebrow">Question</p>
+    <h2 class="hx">Can shared memory beat a robot that only remembers itself?</h2>
+    <p class="lede">Can a robot improve object-search success and efficiency by maintaining shared, time-aware object-centric memory from human smart glasses and robot observations, and actively deciding when to inspect, ask, or report?</p>
+    <p class="copy">Instead of a language instruction or a long video log, the robot keeps object-level evidence and decides what to acquire next. A person may see a screwdriver on the workbench while the dog is elsewhere. Later the workbench is empty. <b>Both observations stay. The earlier one may be stale. The robot then looks again, or asks.</b></p>
+    <p class="copy"><b>Minimum deliverable.</b> The Go2 reaches an object that the glasses saw being moved while it was out of the robot’s view.</p>
+  </div>
+</section>
+
+<section class="sec band" id="scope">
+  <div class="wrap">
+    <p class="eyebrow">Scope</p>
+    <h2 class="hx">One lab, one wearer, a small set of objects.</h2>
+    <p class="lede">The setting is one indoor lab, the RayNeo X3 Pro, a laptop hub, and the Go2 with ROS 2. AprilTags at known positions in the Go2 map are the shared anchor.</p>
+    <div class="steps">
+      <article class="step">
+        <p class="n">In scope</p>
+        <h3>What we build</h3>
+        <ul class="plain">
+          <li>A small predefined set of everyday objects, chosen so detection and localization are reliable.</li>
+          <li>The robot explores first, builds the map and an object-location memory, and initializes the shared memory.</li>
+          <li>The glasses stream camera and IMU. Tags place the wearer. Object moves update location and time before anyone asks.</li>
+          <li>An agent reads that memory and sends navigation goals to the Go2.</li>
+        </ul>
+      </article>
+      <article class="step">
+        <p class="n">Out of scope</p>
+        <h3>What we leave out</h3>
+        <ul class="plain">
+          <li>Open-vocabulary detection of arbitrary objects.</li>
+          <li>Localization without tags. No visual SLAM on the glasses.</li>
+          <li>Multiple rooms, multiple users, or outdoor use.</li>
+        </ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="loop">
+  <div class="wrap">
+    <p class="eyebrow">How it works</p>
+    <h2 class="hx">One lab. Three streams.</h2>
+    <p class="lede">The glasses do not run SLAM. Tags at known positions in the Go2 map are the link between the two.</p>
+    <div class="steps">
+      <article class="step">
+        <p class="n">01</p>
+        <h3>Glasses</h3>
+        <p>The RayNeo X3 Pro streams camera frames and IMU to the laptop. A tag in view places the wearer. An object move updates that object’s location and time.</p>
+      </article>
+      <article class="step">
+        <p class="n">02</p>
+        <h3>Memory</h3>
+        <p>The laptop keeps object-level evidence, not a long video log. Each observation has a place and a timestamp, so a later look can mark an earlier one stale.</p>
+      </article>
+      <article class="step">
+        <p class="n">03</p>
+        <h3>Go2</h3>
+        <p>The dog builds the map and the first object memory. An agent reads that memory and sends a navigation goal. The planner, not the model, routes around furniture.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="map">
+  <div class="wrap">
+    <p class="eyebrow">Lab map</p>
+    <h2 class="hx">The dog maps the room, then walks the names.</h2>
+    <p class="lede">The robot reads one occupancy grid, about 100 m², saved 21 Nov 2026. People marked 17 places on it: desks, the sofa, the podium, the doors, the water cooler.</p>
+    <div class="pair">
+      <figure class="shot">
+        <img src="map_vis/top.png" width="748" height="668" alt="Top-down lidar map with the robot path in red.">
+        <figcaption>Top view. Blue is the lidar cloud. Red is where the dog walked. Green is the robot.</figcaption>
+      </figure>
+      <figure class="shot">
+        <img src="map_vis/view.png" width="1400" height="900" alt="Oblique lidar view of the lab and the walked path.">
+        <figcaption>The same survey from the side. The console and the agent both use this map frame.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="pose">
+  <div class="wrap">
+    <p class="eyebrow">Tag pose</p>
+    <h2 class="hx">Two tags, not one, where the view is hard.</h2>
+    <p class="lede">After calibration (640×480, RMS 0.27 px), the glasses estimate their pose from 15 cm AprilTags and we compare with tape. <b>Under 1 m both setups stay within a few centimeters. Head-on at 2–3 m, one tag flips the tilt.</b></p>
+    <div class="call">
+      <b>120 cm → 6 cm</b>
+      <p class="copy" style="margin-top:8px">Position error at 2 m and 30°, one tag versus two tags seen together. At 3 m head-on, two tags still leave about 90 cm. That case stays open: use an oblique view, or the IMU gravity direction.</p>
+    </div>
+    <div class="chart" role="img" aria-label="Mean position error in centimeters, one tag versus two tags, at nine poses.">
+      <div class="row"><div class="lab">0.5 m, head-on</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:1.7%"></i></div><em>2.0</em></div><div class="barline"><div class="bar two"><i style="width:1.5%"></i></div><em>1.8</em></div></div></div>
+      <div class="row"><div class="lab">0.5 m, 30°</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:1.7%"></i></div><em>2.1</em></div><div class="barline"><div class="bar two"><i style="width:1.5%"></i></div><em>1.8</em></div></div></div>
+      <div class="row"><div class="lab">0.5 m, 60°</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:3.3%"></i></div><em>4.0</em></div><div class="barline"><div class="bar two"><i style="width:2.7%"></i></div><em>3.3</em></div></div></div>
+      <div class="row"><div class="lab">1 m, head-on</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:14%"></i></div><em>16.8</em></div><div class="barline"><div class="bar two"><i style="width:4.6%"></i></div><em>5.5</em></div></div></div>
+      <div class="row"><div class="lab">1 m, 30°</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:2.7%"></i></div><em>3.3</em></div><div class="barline"><div class="bar two"><i style="width:2.6%"></i></div><em>3.1</em></div></div></div>
+      <div class="row"><div class="lab">1 m, 60°</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:2.8%"></i></div><em>3.4</em></div><div class="barline"><div class="bar two"><i style="width:2.7%"></i></div><em>3.3</em></div></div></div>
+      <div class="row"><div class="lab">2 m, head-on</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:44%"></i></div><em>53</em></div><div class="barline"><div class="bar two"><i style="width:19%"></i></div><em>23</em></div></div></div>
+      <div class="row"><div class="lab">2 m, 30°</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:100%"></i></div><em>120</em></div><div class="barline"><div class="bar two"><i style="width:5.1%"></i></div><em>6.1</em></div></div></div>
+      <div class="row"><div class="lab">3 m, head-on</div><div class="bars"><div class="barline"><div class="bar one"><i style="width:89%"></i></div><em>108</em></div><div class="barline"><div class="bar two"><i style="width:75%"></i></div><em>90</em></div></div></div>
+    </div>
+    <p class="legend"><span><i class="one"></i>One tag</span><span><i class="two"></i>Two tags</span><span>Mean position error, centimeters. Home test room, 3 placements × 20 frames.</span></p>
+
+    <div class="gallery poses">
+      <figure>
+        <img src="pose-test/calib/calib_000.jpg" width="480" height="640" alt="Checkerboard used to calibrate the glasses camera.">
+        <figcaption>Calibration board</figcaption>
+      </figure>
+      <figure>
+        <img src="pose-test/poses/d100_a0_r1/frame_00.jpg" width="480" height="640" alt="Two AprilTags on a wall, seen head-on from about 1 meter.">
+        <figcaption>1 m, head-on</figcaption>
+      </figure>
+      <figure>
+        <img src="pose-test/poses/d100_a30_r1/frame_00.jpg" width="480" height="640" alt="Two AprilTags on a wall, seen at an angle from about 1 meter.">
+        <figcaption>1 m, 30°</figcaption>
+      </figure>
+      <figure>
+        <img src="pose-test/poses/d200_a30_r1/frame_00.jpg" width="480" height="640" alt="Two AprilTags on a wall, seen from about 2 meters at 30 degrees.">
+        <figcaption>2 m, 30°</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="places">
+  <div class="wrap">
+    <p class="eyebrow">Saved places</p>
+    <h2 class="hx">The robot already has a name for where to stand.</h2>
+    <p class="lede">Each place is a stand pose, a facing direction, and a photo from the Go2’s front camera. The agent chooses the name. The planner drives there.</p>
+    <div class="gallery">
+      <figure>
+        <img src="robot_stack/go2_maps/lab_places/water_cooler_front.jpg" width="1280" height="720" alt="Front view of the water cooler and an AprilTag on the cabinet.">
+        <figcaption>Water cooler, straight on</figcaption>
+      </figure>
+      <figure>
+        <img src="robot_stack/go2_maps/lab_places/sofa.jpg" width="640" height="360" alt="Go2 view of the lab sofa.">
+        <figcaption>Sofa</figcaption>
+      </figure>
+      <figure>
+        <img src="robot_stack/go2_maps/lab_places/conference_table.jpg" width="640" height="360" alt="Go2 view of the conference table.">
+        <figcaption>Conference table</figcaption>
+      </figure>
+      <figure>
+        <img src="robot_stack/go2_maps/lab_places/podium.jpg" width="640" height="360" alt="Go2 view of the podium.">
+        <figcaption>Podium</figcaption>
+      </figure>
+      <figure>
+        <img src="robot_stack/go2_maps/lab_places/workbench.jpg" width="640" height="360" alt="Go2 view of the workbench.">
+        <figcaption>Workbench</figcaption>
+      </figure>
+      <figure>
+        <img src="robot_stack/go2_maps/lab_places/door_stairwell.jpg" width="640" height="360" alt="Go2 view of the stairwell door.">
+        <figcaption>Stairwell door</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="eval">
+  <div class="wrap">
+    <p class="eyebrow">Evaluation</p>
+    <h2 class="hx">Same object, three memories.</h2>
+    <p class="lede">An object from a small predefined set is moved while the robot is not looking. Then the robot is asked to find it. At least 10 trials per condition, same placements.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Condition</th><th>What the robot uses</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Robot-only</td><td>Only its own last observation of the object.</td></tr>
+          <tr><td>Naive human + robot</td><td>Glasses observations, without timestamps or staleness.</td></tr>
+          <tr><td>Seeing Together</td><td>Shared, time-stamped memory from the glasses and the robot.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <ul class="plain">
+      <li><b>Primary metric:</b> task success rate. <b>Secondary:</b> search time, unnecessary actions, clarification turns, and final position error.</li>
+      <li><b>Trials:</b> at least 10 per condition, with the same object placements across conditions.</li>
+      <li><b>Stress tests:</b> the object is moved out of the robot’s view, and Wi-Fi drops in the middle of a task.</li>
+      <li><b>Component test:</b> tag pose in a home test room, at 0.5, 1, 2, and 3 m and at 0°, 30°, and 60°, one tag against two.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec" id="plan">
+  <div class="wrap">
+    <p class="eyebrow">Plan</p>
+    <h2 class="hx">What is done, and what is next.</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Task</th><th>Owner</th><th>Target</th></tr></thead>
+        <tbody>
+          <tr><td>Camera calibration; tag pose error versus tape, one tag against two</td><td>Hyun Kyum</td><td>Done (Nov 18)</td></tr>
+          <tr><td>Live glasses tag and IMU observations into the shared memory</td><td>Hyun Kyum</td><td>Nov 24</td></tr>
+          <tr><td>Resolve the head-on tilt ambiguity with the IMU gravity direction</td><td>Hyun Kyum</td><td>Nov 24</td></tr>
+          <tr><td>Clearer map and memory construction; LLM-controlled navigation</td><td>Khang</td><td>Done (Nov 24)</td></tr>
+          <tr><td>End-to-end integration; Robot-only and Naive comparison runs</td><td>Both</td><td>Dec 4</td></tr>
+          <tr><td>Final presentation and report</td><td>Both</td><td>Dec 5–11</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3 class="subhead">Response to checkpoint feedback</h3>
+    <ul class="plain">
+      <li><b>Which objects are recorded before the user asks?</b> A predefined set. The robot builds the initial memory. The glasses update a tracked object when it moves.</li>
+      <li><b>Compare one tag with two.</b> Added to the pose test. Two tags cut the hardest errors, from 120 cm to 6 cm at 2 m / 30°, and from 17 cm to 5.5 cm at 1 m head-on. We will place at least two tags per area.</li>
+      <li><b>Validate in a home test room first?</b> The instructor approved it. Tag pose runs there against tape. The lab is for the end-to-end comparison.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="sec band" id="risks">
+  <div class="wrap">
+    <p class="eyebrow">Remaining risks</p>
+    <h2 class="hx">Where it can still fail, and the fallback.</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Risk</th><th>Fallback</th></tr></thead>
+        <tbody>
+          <tr><td>Tag pose error is too large to place an observation on the map. It is small up to 1 m, but a head-on view at 2–3 m flips the tilt.</td><td>Two or more tags per area, and oblique views. Resolve the tilt with the IMU gravity direction. Otherwise snap the observation to the nearest saved place.</td></tr>
+          <tr><td>Live tag detection is unreliable at distance while worn. In the Nov 2 live test, 15 cm tags were found in 18–93% of frames at 2 m, and in 95–100% up to 3 m with the glasses held still.</td><td>Larger tags, more tags per area, or closer viewing distances.</td></tr>
+          <tr><td>The robot side is only tested offline on a saved map so far.</td><td>Run the comparison with the robot driven to the saved places.</td></tr>
+          <tr><td>Wi-Fi drops during a task.</td><td>Buffer observations and resume. The IMU stream already recovers after a drop.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="tests">
+  <div class="wrap">
+    <p class="eyebrow">Feasibility tests</p>
+    <h2 class="hx">What has already been measured.</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Test</th><th>Status</th><th>Result so far</th></tr></thead>
+        <tbody>
+          <tr><td>IMU streaming over Wi-Fi</td><td>Done</td><td>20 s runs: 0% loss, about 109.5 Hz. The app survives a Wi-Fi drop and resumes.</td></tr>
+          <tr><td>Camera access and AprilTag detection</td><td>Done</td><td>Tag detected in 18/18 stills at 0.5–3 m and about 30°/60° (tag on a screen).</td></tr>
+          <tr><td>Camera frame streaming latency</td><td>Done</td><td>640×480 over Wi-Fi: 29.8 fps, 0.8% dropped, median/p95 latency 106/133 ms. Larger frames are limited by JPEG encoding on the glasses.</td></tr>
+          <tr><td>Shared-memory schema</td><td>Prototype</td><td>Tag observations from the glasses load. Robot observations are still mocked.</td></tr>
+          <tr><td>Calibration and tag pose</td><td>Done</td><td>640×480 calibration RMS 0.27 px. Distance error under 6 cm up to 3 m. Position error 2–6 cm up to 1 m with two tags. Head-on at 2–3 m: 23–108 cm (tilt ambiguity).</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="cite">
+  <div class="wrap-copy">
+    <p class="eyebrow">Paper and code</p>
+    <h2 class="hx">Course project, Fall 2026.</h2>
+    <p class="lede">The linked PDF is the checkpoint deck, not the final report. <b>Checkpoint slides: <a href="P01_Checkpoint.pdf">P01_Checkpoint.pdf</a> (November 10, 2026).</b></p>
+    <p class="copy">The code for the glasses tests, the shared-memory prototype, and the Go2 stack is on <a href="https://github.com/hyunkyumkim/seeing-together">GitHub</a>.</p>
+    <pre class="cite">@misc{nguyen2026seeingtogether,
+  title  = {Seeing Together: Smart Glasses-Augmented Spatial
+            Memory for Human-Robot Collaboration},
+  author = {Nguyen, Khang and Kim, Hyun Kyum},
+  year   = {2026},
+  note   = {UCLA ECE M202A, Project 1}
+}</pre>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">UCLA ECE M202A · Project 1 · Khang Nguyen and Hyun Kyum Kim</div>
+</footer>
+</body>
+</html>
