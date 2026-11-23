@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Web console for this folder. Uses go2_maps/lab.grid.npz (the straightened lab map)
+# Web console for this folder. Uses go2_maps/lab.grid.npz (the lab map)
 # and the programs linked next to this script. The lidar driver itself runs from the
 # image khang/go2:dev; controller/ is the source of that driver.
 #   ./start_console.sh          start, or restart the driver only if it has no data

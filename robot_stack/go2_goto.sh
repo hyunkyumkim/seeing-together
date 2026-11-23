@@ -8,7 +8,7 @@
 set -euo pipefail
 URL=http://localhost:8080
 CLIENT=${GO2_AGENT_NAME:-oliver-goto}
-curl -sf -o /dev/null $URL/ || { echo "The console isn't running: start it with run_go2_keys.sh"; exit 1; }
+curl -sf -o /dev/null $URL/ || { echo "The console isn't running: start it with ./start_console.sh"; exit 1; }
 post() { curl -s -H 'Content-Type: application/json' -d "$2" "$URL/agent/$1"; }
 
 if [ $# -eq 0 ]; then

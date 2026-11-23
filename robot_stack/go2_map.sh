@@ -4,7 +4,7 @@
 #   ./go2_map.sh new      start a new map (replaces the saved one when you save)
 #   ./go2_map.sh clear    erase the map on screen (the saved file is kept until you save)
 #   ./go2_map.sh extend   keep adding to the saved map (once lined up with it)
-#   ./go2_map.sh save     stop mapping and save to ~/oliver/go2_maps/lab.* (the old one goes to history/)
+#   ./go2_map.sh save     stop mapping and save to go2_maps/lab.* (the old one goes to history/)
 #   ./go2_map.sh stop     stop mapping without saving
 #   ./go2_map.sh revert   drop unsaved changes: show the saved map again
 #   ./go2_map.sh align    line the dog up with the saved map again

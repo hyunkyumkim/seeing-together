@@ -1,6 +1,6 @@
 # Go2 stack
 
-Everything needed to run the dog from this folder: the web console, the Qwen agent, the lidar driver source, and the current lab map. Links point at the copies in `/home/khang/m202a`, so there is one map and one set of programs.
+Everything needed to run the dog from this folder: the web console, the navigation agent, the lidar driver source, and the current lab map. Links point at the copies in `/home/khang/m202a`, so there is one map and one set of programs.
 
 The dog is `172.17.39.82`. Only one program may connect. Close the Unitree phone app, and stop the other driver if it is up: `docker stop go2_test`.
 
@@ -15,34 +15,45 @@ That starts the driver container `go2_khang` (image `khang/go2:dev`) and the das
 
 The page is `go2_dashboard.py`. Routes and the map pose come from `go2_mapper.py`, `go2_nav.py`, and `go2_agent.py`. `go2_goto.sh sofa` sends the dog to a place without the language model.
 
-## 2. Qwen or OpenAI
+## 2. Ask Qwen or ask GPT
 
-Leave the console running. In another terminal:
+Leave the console running. Both look at the map and the camera photos, then call `go_to` one step at a time. The route around furniture is still the planner in `go2_nav.py`; the model only chooses the goal. With no sentence, either script waits for tasks. `/reset` clears the conversation, `/quit` exits.
+
+Local Qwen on GPU 1:
 
 ```bash
 cd /home/khang/m202a/robot_stack
 ./ask_qwen.sh "find the red cup"
 ```
 
-With no sentence, it waits for tasks. `/reset` clears the conversation, `/quit` exits. The first time on this machine, install the local model once:
+The first time on this machine, install that model once with `./qwen_agent/setup_env.sh`.
+
+OpenAI gpt-4o:
 
 ```bash
-./qwen_agent/setup_env.sh
+OPENAI_API_KEY=sk-... ./ask_gpt.sh "find the red cup"
 ```
 
-By default the agent is local Qwen on GPU 1. OpenAI is the same loop:
+Another vision model is `QWEN_MODEL=gpt-4.1 ./ask_gpt.sh "..."`. Either way the agent only talks to the dog through http://localhost:8080.
+
+## 3. L515 depth camera
+
+The RealSense L515 on the Raspberry Pi is a second camera: color, depth, and a point cloud, on top of the dog's own lidar and front camera. It does not replace either. The sender stays on the Pi (`/home/nesl/oliver/l515_go2_pi4_bridge`, `bash scripts/run_pi.sh`). This folder runs the receiver inside `go2_khang`, so the topics sit next to `/odom` and `/point_cloud2`.
+
+Leave the console running, then:
 
 ```bash
-OPENAI_API_KEY=sk-... QWEN_BACKEND=openai \
-  QWEN_URL=https://api.openai.com/v1 QWEN_MODEL=gpt-4o \
-  ./ask_qwen.sh "find the red cup"
+cd /home/khang/m202a/robot_stack
+./start_l515.sh
 ```
 
-`QWEN_MODEL` must be a vision model. A local vLLM server is the same switch with `QWEN_URL=http://127.0.0.1:8000/v1`. Either way the agent only talks to the dog through http://localhost:8080.
+The page is http://localhost:8081: color, depth, a light point-cloud preview, and a bag recorder into `go2_recordings/`. Topics are `/go2/l515/...` in `ROS_DOMAIN_ID=78`. `./start_l515.sh --status`, `--logs`, and `--stop` check or stop it. A driver restart (`./start_console.sh --reset`) stops the receiver; run `./start_l515.sh` again afterwards.
+
+The mount is still unmeasured, so the cloud sits at the origin of `base_link` until you set it, for example `L515_MOUNT_XYZ="0.28 0 0.12" L515_MOUNT_RPY_DEG="0 10 0" ./start_l515.sh`. The Pi login defaults to `khang@172.17.29.72`; if that address changed, `L515_PI=khang@<ip> ./start_l515.sh`.
 
 ## The map
 
-The robot reads **`go2_maps/lab.grid.npz`**. That file is the straightened lab map (23 Oct 2026). Named spots are **`go2_maps/lab.places.json`** (16 places). Photos for those spots are in `go2_maps/lab_places/`.
+The robot reads **`go2_maps/lab.grid.npz`**. That file is the lab map saved 21 Nov 2026 (about 100 m²). Named spots are **`go2_maps/lab.places.json`** (17 places). Photos for those spots are in `go2_maps/lab_places/`.
 
 After a reboot the dog's odometry starts over. On the console, line it up with the map before a `go_to`.
 
