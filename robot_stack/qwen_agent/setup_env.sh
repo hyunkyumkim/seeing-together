@@ -27,4 +27,4 @@ EOF
 echo "Fetching $MODEL (resumable; re-run if it stops)..."
 "$PY" -c "from huggingface_hub import snapshot_download; print(snapshot_download('$MODEL'))"
 echo "Done. conda activate $ENV_NAME"
-echo "Start the console (run_go2_keys.sh), then: $HERE/run.sh \"find the red cup\""
+echo "Start the console (./start_console.sh), then: $HERE/../ask_qwen.sh \"find the red cup\""
