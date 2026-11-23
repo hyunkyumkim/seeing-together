@@ -57,7 +57,7 @@ The Go2 reaches an object that the glasses saw being moved while it was out of t
 | Camera calibration; tag pose error vs tape-measured positions (one vs two tags) | Hyun Kyum | Done (Nov 18) |
 | Live glasses tag and IMU observations into the shared memory | Hyun Kyum | Nov 24 |
 | Resolve the head-on tilt ambiguity with the IMU gravity direction | Hyun Kyum | Nov 24 |
-| Clearer map and memory construction; LLM-controlled navigation | Khang | Nov 24 |
+| Clearer map and memory construction; LLM-controlled navigation | Khang | Done (Nov 24) |
 | End-to-end integration; Robot-Only and Naive comparison runs | Both | Dec 4 |
 | Final presentation and report | Both | Dec 5-11 |
 
